@@ -49,7 +49,7 @@ We have developed such a file for Raspberry Pi Pico W with GGreg20_V3 and posted
 > The YAML file is a common text script file in Home Assistant (in this case dedicated to ESPHome) which is used as config when building the firmware.
 
 Let's look on the main parts of the [rpipicow-ggreg20-v3.yaml](rpipicow-ggreg20-v3.yaml) file prepared by us:
-
+![RPi Pico W in ESPHome devices List](extras/ESPHome_RPiPicoW_deviceList_Scr_2023-07-07_150813.jpg)
 ### Calculating CPM and uSv/h
 To calculate the value of the ionizing radiation power in CPM and in microsieverts per hour, we used Pulse Counter Sensor - an API-component of the ESPHome plug-in:
 https://esphome.io/components/sensor/pulse_counter.html
@@ -221,6 +221,19 @@ select:
 ```
 
 The ESPHome plugin has sufficient documentation for these components with examples, so we will not go into detailed explanations.
+## Results of our work in Home Assistant
+### RPi ESPHome Log screen
+![Log Screen 1](extras/RPiPicoW_ESPHome_Log_scr1_2023-07-07_151211.jpg)
+### RPi ESPHome Log screen (continued)
+![Log screen 2](extras/RPiPicoW_ESPHome_Log_scr2_2023-07-07_151211.jpg)
+### RPi ESPHome Developer tools section entities list
+![Dev Tools Entities](extras/RPiPicoW_ESPHome_devTools_entities_2023-07-07_151211.jpg)
+### Home Assistant Dashboard wiget (state: normal)
+![Normal State Widget](extras/RPi-Pico-W_HA_ESPHome-NormalState_Widget_2023-07-07_141027.jpg)
+### Source yaml config part dedicated to Text states  
+![Text states in yaml](extras/RPiPicoW_ESPHome_yaml_states_2023-07-07_151211.jpg)
+### Home Assistant Dashboard wiget (state: sensor error)
+![Sensor error state](extras/RPi-Pico-W_HA_ESPHome-SensorError_Widget_2023-07-07_141027.jpg)
 
 ## GGreg20_V3 examples for other platforms
 [GGreg20_V3 Root repo](https://github.com/iotdevicesdev/DIY-Geiger-Counter-Module-GGreg20_V3)
