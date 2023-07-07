@@ -1,7 +1,7 @@
 [![Stand With Ukraine](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/banner-direct-team.svg)](https://stand-with-ukraine.pp.ua)
 
 # Raspberry Pi Pico W Geiger counter using GGreg20_V3 and ESPHome
-
+![Main pic](extras/GGreg20_V3_RPiPicoW_YAML_HA_ESPHome_ENG.jpg)
 ## ESPHome and Home Assistant Compatibility
 This hardware device is designed to be compatible with as many common software platforms and hardware systems as possible. GGreg20_V3 is compatible with any of the following systems: Arduino, ESP8266, ESP32, STM32, Raspberry Pi, ESPHome, Home Assistant, Tasmota, MicroPython, NodeMCU, Node-RED and many others. All you need to connect the GGreg20_V3 is a system with a pulse counter on the GPIO and a timer to measure time.
 
