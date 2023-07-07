@@ -1,0 +1,189 @@
+esphome:
+  name: rpipicow-ggreg20-v3
+  friendly_name: rpi-pico-w
+  comment: "Configuration example of Geiger counter GGreg20_V3 J305/SBM20 for RPi Pico W with ESPHome firmware"
+  project:
+    name: "iot-devices.ggreg20_v3-rpi_pico_w"
+    version: "1.0.0"
+
+rp2040:
+  board: rpipicow #pico-w
+  framework:
+    # Required until https://github.com/platformio/platform-raspberrypi/pull/36 is merged
+    platform_version: https://github.com/maxgerhardt/platform-raspberrypi.git
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: "KEYVALUE"
+
+ota:
+
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+#  use_address: esphome-web-0a3b78.local
+
+  # Enable fallback hotspot in case wifi connection fails
+  ap:
+    ssid: "Esphome-Web-xxxxxx"
+    password: "password"
+
+globals:
+  - id: conv_factor
+    type: float
+    restore_value: yes
+    initial_value: "0.00332"
+  - id: noise_comp
+    type: int
+    restore_value: yes
+    initial_value: "0"
+
+select:
+  - platform: template
+    name: Tube noise compensation
+    id: tube_noise_comp
+    restore_value: yes
+    options:
+      - "Off"
+      - "On"
+    initial_option: "Off"
+    optimistic: True
+    on_value:
+      then:
+        - if:
+            condition:
+              lambda: 'return id(tube_noise_comp).state == "Off";'
+            then:
+              - lambda: "id(noise_comp) = 0;"
+            else:
+              lambda: "id(noise_comp) = 1;"
+        - sensor.template.publish:
+            id: noise_comp_sensor
+            state: !lambda |-
+              return id(noise_comp);
+ 
+  - platform: template
+    name: GM-tube type
+    id: gm_tube_type
+    restore_value: yes
+    options:
+      - "J305"
+      - "SBM20"
+    initial_option: "J305"
+    optimistic: True
+    on_value:
+      then:
+        - if:
+            condition:
+              lambda: 'return id(gm_tube_type).state == "J305";'
+            then:
+              lambda: "id(conv_factor) = 0.00332;"
+            else:
+              lambda: "id(conv_factor) = 0.0057;"
+        - sensor.template.publish:
+            id: gm_tube_convf_sensor
+            state: !lambda |-
+              return id(conv_factor);
+
+# No pullup or pulldown on Raspberry Pi Pico W side because of internal pullup is set in hardware at GGreg20_V3 pulse output side
+# Do not use this, since the pulse_counter component performs all the necessary GPIO mode settings:
+#binary_sensor:
+#  - platform: gpio
+#    name: "Pulse input state"
+#    id: pulse_input
+#    pin:
+#      number: GPIO2
+#      inverted: True
+#      mode: 
+#        input: True 
+#        pullup: False
+#        pulldown: False
+
+
+sensor:
+  - platform: pulse_counter
+    pin: GPIO2
+    unit_of_measurement: 'CPM'
+    name: 'Ionizing Radiation Power CPM'
+    count_mode: 
+      rising_edge: DISABLE
+      falling_edge: INCREMENT # GGreg20_V3 uses Active-Low logic
+    use_pcnt: False
+    internal_filter: 190us
+    update_interval: 60s
+    accuracy_decimals: 0
+    id: cpm_value
+    filters:
+    #  - offset: -12 # if J305 is used, it has background noise 0.2 pulses / sec x 60 sec = 12 CPM (Counts per minute)
+      - lambda: "if (id(noise_comp) == 1 and id(conv_factor) == 0.00332 and x >=12 ) return x - 12; else return x;"
+      - lambda: "if (id(noise_comp) == 1 and id(conv_factor) == 0.0057 and x >=60 ) return x - 60; else return x;"
+
+  - platform: copy
+    source_id: cpm_value
+    name: 'Ionizing Radiation Power uSv/h'
+    unit_of_measurement: 'uSv/h'
+    accuracy_decimals: 3
+    id: usvperh_value
+    icon: "mdi:radioactive"
+    filters:
+# Uncomment this to get MA-5 values
+#      - sliding_window_moving_average: # 5-minutes moving average (MA5) here
+#          window_size: 5
+#          send_every: 1      
+
+      # 0.00332 - J305βγ glass GM tube (datasheet sensitivity at 60Co, 44 CPS per mR/h) conversion factor of pulses into uSv/Hour
+      # 0.0057 - SBM20 GM tube conversion factor of pulses into uSv/Hour
+      - lambda: return x * id(conv_factor);
+
+  - platform: integration
+    name: "Total Ionizing Radiation Dose"
+    unit_of_measurement: "uSv"
+    sensor: usvperh_value # link entity id to the values above
+    icon: "mdi:radioactive"
+    accuracy_decimals: 5
+    time_unit: min # integrate values every next minute
+    filters:
+      # obtained dose. Converting from uSv/hour into uSv/minute: [uSv/h / 60] OR [uSv/h * 0.0166666667]. 
+      # But if cpm_value is used in CPM (instead of usvperh_value), then for J305 [0.00332 / 60 minutes] = 0.00005533; so CPM * 0.00005533 = dose every next minute, uSv.
+      - multiply: 0.0166666667
+
+  - platform: template
+    name: "GM-tube Conversion Factor"
+    id: gm_tube_convf_sensor
+    accuracy_decimals: 5
+    lambda: |-
+      return id(conv_factor);
+    update_interval: 60s
+
+  - platform: template
+    name: "Internal Noise Compensation Mode"
+    id: noise_comp_sensor
+    accuracy_decimals: 0
+    lambda: |-
+      return id(noise_comp);
+    update_interval: 60s
+
+text_sensor:
+  - platform: template
+    name: "Ionizing Radiation State"
+    icon: "mdi:radioactive"
+    lambda: |-
+      if (id(usvperh_value).state <= 0.01) {
+        return {"sensor error"};
+      } 
+      else if (id(usvperh_value).state > 0.01 and id(usvperh_value).state < 0.3)  {
+        return {"normal"};
+      } 
+      else if (id(usvperh_value).state >= 0.3 and id(usvperh_value).state < 0.6)  {
+        return {"warning"};
+      } else if (id(usvperh_value).state >= 0.6)  {
+        return {"danger"};
+      } else {
+        return {"unknown"};
+      }
+    update_interval: 60s
