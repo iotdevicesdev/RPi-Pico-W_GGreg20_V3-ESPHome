@@ -48,7 +48,7 @@ Team IoT-devices, LLC
 We have developed such a file for Raspberry Pi Pico W with GGreg20_V3 and posted it here for free download and use by anyone who needs to connect GGreg20 to Home Assistant via ESPHome.
 > The YAML file is a common text script file in Home Assistant (in this case dedicated to ESPHome) which is used as config when building the firmware.
 
-Let's look on the main parts of the rpipicow-ggreg20-v3.yaml file prepared by us:
+Let's look on the main parts of the [rpipicow-ggreg20-v3.yaml](rpipicow-ggreg20-v3.yaml) file prepared by us:
 
 ### Calculating CPM and uSv/h
 To calculate the value of the ionizing radiation power in CPM and in microsieverts per hour, we used Pulse Counter Sensor - an API-component of the ESPHome plug-in:
