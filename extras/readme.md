@@ -1,1 +1,1 @@
-Resources directory
+# Resources directory
