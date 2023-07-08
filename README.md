@@ -42,7 +42,15 @@ Team IoT-devices, LLC
 - Datasheet https://iot-devices.com.ua/wp-content/uploads/2021/11/ggreg20_v3-datasheet-eng.pdf
 - RPi Pico W Pinout https://datasheets.raspberrypi.com/picow/PicoW-A4-Pinout.pdf
 - ESPHome https://esphome.io/components/rp2040.html
+## Connection
+Wiring description:
+- RPi-Pico-W Input Pulses - Pin 4 (GP2) <=> GGreg20_V3 OUT
+- RPi-Pico-W Common Ground - Pin 3 (GND) <=> GGreg20_V3 GND
+- RPi-Pico-W VCC - Pin 36 (3V3(OUT)) <=> GGreg20_V3 BAT +
+- RPi-Pico-W Common Ground - Pin 38 (GND) <=> GGreg20_V3 BAT -
 
+
+![Connection RPi-Pico-W and GGreg20_V3](extras/GGreg20_V3_RPiPicoW_connectionExample_ENG.jpg)
 ## RPi Pico W Exapmle config code
 
 We have developed such a file for Raspberry Pi Pico W with GGreg20_V3 and posted it here for free download and use by anyone who needs to connect GGreg20 to Home Assistant via ESPHome.
@@ -242,6 +250,10 @@ The ESPHome plugin has sufficient documentation for these components with exampl
 On Tindie: https://www.tindie.com/products/iotdev/ggreg20_v3-ionizing-radiation-detector/
 
 IoT-devices Online Shop: https://iot-devices.com.ua/en/product/ggreg20_v3-ionizing-radiation-detector-with-geiger-tube-sbm-20/
+
+<a href="https://www.youtube.com/watch?feature=player_embedded&v=RwH5-hlW5QQ" target="_blank">
+ <img src="https://img.youtube.com/vi/RwH5-hlW5QQ/mqdefault.jpg" alt="Watch the video" border="10" />
+</a><br>
 
 <a href="https://www.youtube.com/watch?feature=player_embedded&v=lGIwdO35k1w" target="_blank">
  <img src="https://img.youtube.com/vi/lGIwdO35k1w/mqdefault.jpg" alt="Watch the video" border="10" />
